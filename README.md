@@ -9,6 +9,8 @@ skeleton for projects that require user registration and authentication with Sym
 * Optional double opt-in
 * Automatic login after user activation and password reset
 * Bootstrap 4 theme
+* Facebook login
+* Comments 
 
 ## Usage
 
