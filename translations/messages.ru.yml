@@ -1,0 +1,47 @@
+site:
+  name: Тестовое приложение
+  comment: Добавить комментарий
+
+button:
+  save: Сохранить
+user:
+  email: Email
+  password:
+    first: Пароль
+    second: Повторите пароль
+  name: Имя
+  lastname: Фамилия
+
+  not-found: Пользователь не найден
+
+  change: Изменить профиль
+
+  edit: Редактировать
+  forgot-password: Я забыл пароль
+  login: Вход
+  logout: Выход
+  no-account: Регистрация
+  facebook-login: Войти через Facebook
+  reset-password: Сбросить
+  sign-up: Зарегистрироваться
+  update:
+    success: Ваш аккаунт обновлён
+    error: Пожалуйста, попробуйте позже
+
+  welcome: Добро пожаловать! Вы успешно авторизованы
+  yes-account: У меня уже есть аккаунт
+
+  activation-link:  Ссылка для активации вашего аккаунта отправлена вам на почту. Проверьте это!
+  request-password-link: Ссылка для сброса пароля отправлена вам на почту. Проверьте это!
+  mailer:
+    activation.html: 'Нажмите <a href="%activationUrl%" target="_blank">here</a>, чтобы активировать ваш аккаунт'
+    activation.txt: 'Нажмите на ссылку, чтобы активировать ваш аккаунт %activationUrl%'
+    reset-password.html: 'Нажмите <a href="%resetPasswordUrl%" target="_blank">здесь</a>, чтобы сбросить пароль '
+    reset-password.txt: 'Нажмите на ссылку, чтобы сбросить пароль %resetPasswordUrl%'
+
+captcha.wrong: Please prove you are not a robot
+rememberme: Запомнить
+
+comment:
+  no-author: Аноним
+  empty: Пока нет комментариев

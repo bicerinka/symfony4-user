@@ -32,6 +32,9 @@ class EditType extends AbstractType
             ])
             ->add('name', null, [
                 'label' => 'user.name'
+            ])
+            ->add('lastname', null, [
+                'label' => 'user.lastname'
             ]);
         parent::buildForm($builder, $options);
     }

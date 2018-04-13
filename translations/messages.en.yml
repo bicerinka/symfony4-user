@@ -9,6 +9,7 @@ user:
     first: Password
     second: Repeat password
   name: Name
+  lastname: Last Name
 
   not-found: User not found
 
@@ -17,6 +18,7 @@ user:
   login: Login
   logout: Logout
   no-account: I don't have an account
+  facebook-login: Facebook login
   reset-password: Reset password
   sign-up: Sign up
   update:

@@ -16,8 +16,16 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
- * @ORM\Entity()
- * @UniqueEntity(fields={"email"}, message="user.exists")
+ * @ORM\Entity
+
+ * @ORM\Table(
+* uniqueConstraints={@ORM\UniqueConstraint(name="facebook_email",columns={"email","facebook"})}
+*    )
+ * @UniqueEntity(
+ *     fields={"email","facebook"},
+ *      errorPath="facebook",
+ *      message="user.exists"
+ * )
  */
 class User implements AdvancedUserInterface, \Serializable
 {
@@ -29,7 +37,13 @@ class User implements AdvancedUserInterface, \Serializable
     private $id;
 
     /**
-     * @ORM\Column(type="string", length=60, unique=true)
+     * @ORM\Column(type="string", nullable=false, options={"default"="0"})
+     */
+    private $facebook;
+
+    /**
+     * @ORM\Column(type="string", length=120)
+     * @ORM\ManyToOne(targetEntity="email")
      * @Assert\NotBlank(groups={"Registration"})
      * @Assert\Email()
      */
@@ -52,6 +66,11 @@ class User implements AdvancedUserInterface, \Serializable
      * @ORM\Column(type="string", nullable=true)
      */
     private $name;
+
+    /**
+     * @ORM\Column(type="string", nullable=true)
+     */
+    private $lastname;
 
     /**
      * @ORM\Column(type="string", nullable=true)
@@ -102,6 +121,22 @@ class User implements AdvancedUserInterface, \Serializable
     /**
      * @return string
      */
+    public function getFacebook()
+    {
+        return $this->facebook;
+    }
+
+    /**
+     * @param string $facebook
+     */
+    public function setFacebook($facebook): void
+    {
+        $this->facebook = $facebook;
+    }
+
+    /**
+     * @return string
+     */
     public function getEmail()
     {
         return $this->email;
@@ -140,11 +175,27 @@ class User implements AdvancedUserInterface, \Serializable
     }
 
     /**
-     * @param string $nome
+     * @param string $name
      */
-    public function setName($nome): void
+    public function setName($name): void
     {
-        $this->name = $nome;
+        $this->name = $name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastname()
+    {
+        return $this->lastname;
+    }
+
+    /**
+     * @param mixed $lastname
+     */
+    public function setLastname($lastname): void
+    {
+        $this->lastname = $lastname;
     }
 
     /**
@@ -223,8 +274,10 @@ class User implements AdvancedUserInterface, \Serializable
     {
         return serialize(array(
             $this->id,
+            $this->facebook,
             $this->email,
             $this->name,
+            $this->lastname,
             $this->isActive,
             $this->password,
         ));
@@ -235,8 +288,10 @@ class User implements AdvancedUserInterface, \Serializable
     {
         list (
             $this->id,
+            $this->facebook,
             $this->email,
             $this->name,
+            $this->lastname,
             $this->isActive,
             $this->password,
             ) = unserialize($serialized);

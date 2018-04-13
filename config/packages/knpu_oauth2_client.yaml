@@ -1,0 +1,15 @@
+knpu_oauth2_client:
+    clients:
+        # the key "facebook_main" can be anything, it
+        # will create a service: "knpu.oauth2.client.facebook_main"
+        facebook_main:
+            # this will be one of the supported types
+            type: facebook
+            client_id: 2081533352069323
+            client_secret: 94b394ebb3a9a4d74b989f347fa58896
+            # the route that you're redirected to after
+            # see the controller example below
+            redirect_route: facebook_check
+            # route parameters to pass to your route, if needed
+            redirect_params: {}
+            graph_api_version: v2.8

@@ -6,6 +6,7 @@
 
     {% block stylesheets %}
         <link rel="stylesheet" href="/build/app.css">
+        <link rel="stylesheet" href="/build/style.css">
     {% endblock %}
 </head>
 
@@ -24,8 +25,10 @@
             </ul>
             <ul class="navbar-nav ml-auto">
                 {% if is_granted('ROLE_USER') %}
-                    <li class="nav-item"><a class="nav-link" href="{{ path('user_edit') }}">{{ app.user.email }}</a>
+                    {% if app.user.facebook == 0 %}
+                    <li class="nav-item"><a class="nav-link" href="{{ path('user_edit') }}">{{ 'user.change'|trans }}</a>
                     </li>
+                    {% endif %}
                     <li class="nav-item"><a class="nav-link"
                                             href="{{ path('security_logout') }}">{{ 'user.logout'|trans }}</a></li>
                 {% else %}
@@ -38,7 +41,7 @@
     </div>
 </nav>
 
-<div class="main-content" style="margin-top: 56px;">
+<div class="main-content">
     {% block flashmessages %}
         {% if app.session.flashbag.peekAll|length > 0 %}
             {% for type, messages in app.session.flashbag.all %}

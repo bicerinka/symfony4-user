@@ -15,6 +15,7 @@ use App\Form\User\RegistrationType;
 use App\Form\User\RequestResetPasswordType;
 use App\Form\User\ResetPasswordType;
 use App\Security\LoginFormAuthenticator;
+
 use App\Service\CaptchaValidator;
 use App\Service\Mailer;
 use App\Service\TokenGenerator;
@@ -28,6 +29,10 @@ use Symfony\Component\Security\Core\Encoder\UserPasswordEncoderInterface;
 use Symfony\Component\Security\Guard\GuardAuthenticatorHandler;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
+use KnpU\OAuth2ClientBundle\KnpUOAuth2ClientBundle;
+
+use League\OAuth2\Client\Provider\Exception\IdentityProviderException;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 /**
  * @Route("/user", name="user_")
@@ -48,46 +53,46 @@ class UserController extends AbstractController
      * @return Response
      */
     public function register(Request $request, TokenGenerator $tokenGenerator, UserPasswordEncoderInterface $encoder,
-                             Mailer $mailer, CaptchaValidator $captchaValidator, TranslatorInterface $translator)
+                             Mailer $mailer, ValidatorInterface $validator, TranslatorInterface $translator)
     {
         $form = $this->createForm(RegistrationType::class);
         $form->handleRequest($request);
-
+        $errors = [];
         if ($form->isSubmitted() && $form->isValid()) {
             /** @var User $user */
             $user = $form->getData();
+            $user->setFacebook(0);
+            $errors = $validator->validate($form->getData());
 
-            try {
-                if (!$captchaValidator->validateCaptcha($request->get('g-recaptcha-response'))) {
-                    $form->addError(new FormError($translator->trans('captcha.wrong')));
-                    throw new ValidatorException('captcha.wrong');
+            if (!count($errors)) {
+                try {
+                    $user->setPassword($encoder->encodePassword($user, $user->getPassword()));
+                    $token = $tokenGenerator->generateToken();
+                    $user->setToken($token);
+                    $user->setIsActive(false);
+
+                    $em = $this->getDoctrine()->getManager();
+                    $em->persist($user);
+                    $em->flush();
+
+                    if (self::DOUBLE_OPT_IN) {
+                        $mailer->sendActivationEmailMessage($user);
+                        $this->addFlash('success', 'user.activation-link');
+                        return $this->redirect($this->generateUrl('homepage'));
+                    }
+
+                    return $this->redirect($this->generateUrl('user_activate', ['token' => $token]));
+
+                } catch (ValidatorException $exception) {
+
                 }
-
-                $user->setPassword($encoder->encodePassword($user, $user->getPassword()));
-                $token = $tokenGenerator->generateToken();
-                $user->setToken($token);
-                $user->setIsActive(false);
-
-                $em = $this->getDoctrine()->getManager();
-                $em->persist($user);
-                $em->flush();
-
-                if (self::DOUBLE_OPT_IN) {
-                    $mailer->sendActivationEmailMessage($user);
-                    $this->addFlash('success', 'user.activation-link');
-                    return $this->redirect($this->generateUrl('homepage'));
-                }
-
-                return $this->redirect($this->generateUrl('user_activate', ['token' => $token]));
-
-            } catch (ValidatorException $exception) {
-
             }
         }
 
         return $this->render('user/register.html.twig', [
             'form' => $form->createView(),
-            'captchakey' => $captchaValidator->getKey()
+            'errors' => $errors,
+//            'captchakey' => $captchaValidator->getKey()
         ]);
     }
 
@@ -180,14 +185,14 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
             try {
-                if (!$captchaValidator->validateCaptcha($request->get('g-recaptcha-response'))) {
-                    $form->addError(new FormError($translator->trans('captcha.wrong')));
-                    throw new ValidatorException('captcha.wrong');
-                }
+//                if (!$captchaValidator->validateCaptcha($request->get('g-recaptcha-response'))) {
+//                    $form->addError(new FormError($translator->trans('captcha.wrong')));
+//                    throw new ValidatorException('captcha.wrong');
+//                }
                 $repository = $this->getDoctrine()->getRepository(User::class);
 
                 /** @var User $user */
-                $user = $repository->findOneBy(['email' => $form->get('_username')->getData(), 'isActive' => true]);
+                $user = $repository->findOneBy(['email' => $form->get('_username')->getData(), 'isActive' => true, 'facebook' => null]);
                 if (!$user) {
                     $this->addFlash('warning', 'user.not-found');
                     return $this->render('user/request-password-reset.html.twig', [
@@ -259,5 +264,4 @@ class UserController extends AbstractController
 
         return $this->render('user/password-reset.html.twig', ['form' => $form->createView()]);
     }
-
 }

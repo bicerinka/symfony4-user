@@ -1,0 +1,17 @@
+.main-content{
+    margin: 56px 15px 0;
+}
+.pull-right{
+    width: 100%;
+}
+.add-comment{
+    margin-bottom: 50px;
+}
+.post-comment:first-of-type{
+    margin-top: 50px;
+}
+.comment{
+    border-bottom: 1px dashed #007bff;
+    text-indent: 10px;
+    padding-top: 12px;
+}

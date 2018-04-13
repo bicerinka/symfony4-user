@@ -1,4 +1,33 @@
 {% extends 'base.html.twig' %}
 
 {% block content %}
+
+    {% if is_granted('ROLE_USER') %}
+        <div id="add-comment" class="well add-comment">
+            {{ render(controller('App\\Controller\\SiteController:commentForm')) }}
+        </div>
+    {% else %}
+    {% endif %}
+
+    {% for comment in comments %}
+
+        <div class="row post-comment">
+            <div class="col-sm-12 comment">
+                <strong>
+                    {% if comment.author.name is not null %}
+                        {{ comment.author.name }}
+                    {% else %}
+                        {{ 'comment.no-author'|trans }}
+                    {% endif %}
+                </strong>
+                <strong>{{ comment.publishedAt.date|date('d-m-y H:i') }}</strong>
+                <p>{{ comment.content }}</p>
+            </div>
+        </div>
+
+    {% else %}
+        <div class="post-comment">
+            <p>{{ 'comment.empty'|trans }}</p>
+        </div>
+    {% endfor %}
 {% endblock %}
