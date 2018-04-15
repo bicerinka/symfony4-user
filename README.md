@@ -3,12 +3,13 @@ skeleton for projects that require user registration and authentication with Sym
 
 ## Features
 
-* User registration (with ReCaptcha) and authentication
+* User registration and authentication
 * User edit
-* Password reset (with ReCaptcha)
 * Optional double opt-in
-* Automatic login after user activation and password reset
+* Automatic login after user activation
 * Bootstrap 4 theme
+* Facebook login
+* Comments 
 
 ## Usage
 
