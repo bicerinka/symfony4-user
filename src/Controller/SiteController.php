@@ -23,6 +23,9 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Method;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Security;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Security\Core\User\User;
+use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class SiteController extends AbstractController
 {
@@ -74,7 +77,34 @@ class SiteController extends AbstractController
         }
     }
 
+    /**
+     * @Route("/comment-edit", name="comment_edit")
+     * @Method("POST")
+     * @Security("has_role('ROLE_USER')")
+     * @ParamConverter("post", options={"mapping": {"postSlug": "slug"}})
+     * @return Response
+     */
+    public function commentEdit(Request $request, EventDispatcherInterface $eventDispatcher, ValidatorInterface $validator): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        $text = $request->request->all()['text'];
 
+        $repository = $this->getDoctrine()->getRepository(Comment::class);
+        $comment = $repository->findOneBy(['id' => $request->request->get('id')]);
+        $entityManager = $this->getDoctrine()->getManager();
+        $comment->setContent($text);
+        $errors = $validator->validateProperty($comment, 'content');
+        $response = 'error';
+        if ( $comment->getAuthor() === $this->getUser() && $errors->count() == 0 ) {
+            $comment->setContent($text);
+            $entityManager->flush();
+            $response = '';
+        }
+        return new Response(
+            $response
+        );
+
+    }
 
     /**
      * This controller is called directly via the render() function in the

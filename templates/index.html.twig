@@ -12,7 +12,7 @@
     {% for comment in comments %}
 
         <div class="row post-comment">
-            <div class="col-sm-12 comment">
+            <div class="col-sm-10 comment">
                 <strong>
                     {% if comment.author.name is not null %}
                         {{ comment.author.name }}
@@ -21,7 +21,13 @@
                     {% endif %}
                 </strong>
                 <strong>{{ comment.publishedAt.date|date('d-m-y H:i') }}</strong>
-                <p>{{ comment.content }}</p>
+                <p class="message">{{ comment.content }}</p>
+                <input type="hidden" class="comment-id" value="{{ comment.id }}">
+            </div>
+            <div class="col-sm-2 comment">
+                {% if is_granted('ROLE_USER') and app.user.email == comment.author.email and app.user.facebook == comment.author.facebook %}
+                    <button type="button" class="btn btn-secondary edit">Edit</button>
+                {% endif %}
             </div>
         </div>
 
@@ -30,4 +36,62 @@
             <p>{{ 'comment.empty'|trans }}</p>
         </div>
     {% endfor %}
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://unpkg.com/sweetalert2@7.1.2/dist/sweetalert2.all.js"></script>
+    <script>
+        $("body").on('click', '.edit', function()
+        {
+            let clickedCard = $(this).closest('.post-comment');
+            let message = clickedCard.find('.message');
+            swal({
+                title: "{{ 'comment.edit'|trans }}",
+                input: 'textarea',
+                inputValue: message.text(),
+                showCancelButton: true,
+                confirmButtonText: "{{ 'comment.save'|trans }}",
+                cancelButtonText: "{{ 'comment.cancel'|trans }}",
+                showLoaderOnConfirm: true,
+                preConfirm: (textarea) => {
+                    return new Promise((resolve) => {
+                            if (textarea.length < 5) {
+                                swal.showValidationError(
+                                    "{{ 'comment.error'|trans }}"
+                                )
+                            }
+                            resolve()
+
+                    })
+                },
+            }).then((result) => {
+                if (result.value) {
+                    let routePath = "{{ (path('comment_edit')) }}";
+                    $.post(routePath,
+                        {
+                            id: clickedCard.find("input.comment-id").val(),
+                            text: result.value,
+                        },
+                        function(data){
+                            if(!data)
+                            {
+                                message.text(result.value);
+                                swal({
+                                    type: 'success',
+                                    title: "{{ 'comment.success'|trans }}",
+                                    showConfirmButton: false,
+                                    timer: 1500
+                                });
+                            }else {
+                                swal({
+                                        type: 'error',
+                                        title: "{{ 'comment.uknown-error'|trans }}",
+                                    });
+                            }
+                        });
+                }
+            });
+        });
+    </script>
 {% endblock %}
