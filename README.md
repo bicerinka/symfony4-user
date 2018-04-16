@@ -1,5 +1,5 @@
 # symfony4-user
-skeleton for projects that require user registration and authentication with Symfony 4
+основа для проектов с регистрацией и авторизацией на Symfony 4
 
 ## Функции
 
