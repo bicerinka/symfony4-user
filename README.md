@@ -1,19 +1,27 @@
 # symfony4-user
 skeleton for projects that require user registration and authentication with Symfony 4
 
-## Features
+## Функции
 
-* User registration and authentication
-* User edit
-* Optional double opt-in
-* Automatic login after user activation
-* Bootstrap 4 theme
-* Facebook login
-* Comments 
+* Регистрация и авторизация пользователей
+* Редактирование профиля
+* Автоматическая авторизация после рагистрации
+* Bootstrap 4 тема
+* Facebook авторизация(для реального проекта нужно настроить своё приложение на странице в facebook)
+* Комментарии с редактированием без перезагрузки страницы
 
-## Usage
-
-Set environment variables in .env; you'll need a db, a mailer and recaptcha keys. Then run
+## Установка
+* Скачайте проект вручную или с помощью git clone в папку веб-сервера
+* Создайте файл .env на основе файла .env.dist и пропишите доступ к будущей базе данных в строке с DATABASE_URL
+* Перейдите в папку проекта в консоли и выполните команду composer install(желательно иметь последнюю версию composer)
+* Затем последовательно выполните команды
 
 	$ php bin/console doctrine:database:create
 	$ php bin/console doctrine:migrations:migrate
+* Теперь можно запустить проект с помощью команды
+    $ php -S 127.0.0.1:8000 -t public 
+* И проверить по адресу http://localhost:8000/
+
+## Дополнительно
+Чтобы запустить одновременно два проекта на symfony4, можно использовать другой порт 8080, команда в папке прокта
+    $ php -S 127.0.0.1:8000 -t public
